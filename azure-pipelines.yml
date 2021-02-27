@@ -28,4 +28,34 @@ steps:
     codeCoverageTool: Cobertura
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/*coverage.xml'
     reportDirectory: '$(System.DefaultWorkingDirectory)/**/coverage'
-    
+ 
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Free Trial(58ba1a37-8809-4480-8686-fd128d1e41e5)'
+    scriptType: 'batch'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az aks get-credentials --resource-group VIDXLCI-PROD5-AKSRG --name ACIPROD2LAAKSCLUS05'
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Free Trial(58ba1a37-8809-4480-8686-fd128d1e41e5)'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: 'az aks update -n ACIPROD2LAAKSCLUS05 -g VIDXLCI-PROD5-AKSRG --attach-acr Registry1ek'
+- task: Kubernetes@1
+  inputs:
+    connectionType: 'Azure Resource Manager'
+    azureSubscriptionEndpoint: 'Free Trial(58ba1a37-8809-4480-8686-fd128d1e41e5)'
+    azureResourceGroup: 'VIDXLCI-PROD5-AKSRG'
+    kubernetesCluster: 'ACIPROD2LAAKSCLUS05'
+    command: 'apply'
+    secretType: 'dockerRegistry'
+    containerRegistryType: 'Azure Container Registry'
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Write your commands here
+      
+      echo '$(System)'
+
